@@ -110,6 +110,25 @@ app.get('/profesor/:clave',(req, res) =>{
             }
       })
 })
+
+app.get('/profesor/eliminar/:clave', (req, res) =>{
+    const {clave} = req.params
+    const sql = 'DELETE FROM profesores WHERE clave=?'
+    db.query(sql, [clave], (err, result) =>{
+        if(!err){
+            res.send({
+                status: 200,
+                result,
+            })
+        }else{
+                res.send({
+                    status: 400,
+                    result: {}
+                })
+            }
+      })
+})
+
 app.all('*', (req,res) =>{
     res.send('Esta ruta no existe')
 })
