@@ -75,7 +75,7 @@ app.get('/profesores', (req, res) =>{
             }
     })
 })
-app.post('/profesores/modificar', (req, res) =>{
+app.put('/profesores/modificar', (req, res) =>{
   const {clave, nombres, apellidos, fnacimiento, email, sexo, estadocivil, tcasa, curp, tcelular, calle, colonia, cp, municipio, estado} = req.body
   const sql = 'UPDATE profesores set nombres=?, apellidos=?, fnacimiento=?, email=?, sexo=?, estadocivil=?, tcasa=?, curp=?, tcelular=?, calle=?, colonia=?, cp=?, municipio=?, estado=? WHERE clave=?'
   db.query(sql, [nombres, apellidos, fnacimiento, email, sexo, estadocivil, tcasa, curp, tcelular, calle, colonia, cp, municipio, estado, clave], (err, result) =>{
@@ -127,6 +127,75 @@ app.get('/profesor/eliminar/:clave', (req, res) =>{
                 })
             }
       })
+})
+
+//Post para la información del currículum
+app.post('/curriculum/agregar', (req, res) =>{
+    const { 
+        clave,
+        centroEducativo,
+        ubicacionCentro,
+        titulo,
+        campoEstudio,
+        fechaGraduacion
+    } = req.body
+    const sql = 'INSERT INTO curriculums values(?,?,?,?,?,?)'
+
+    db.query(sql, [clave, centroEducativo, ubicacionCentro, titulo, campoEstudio, fechaGraduacion], (err, result) =>{
+        if(err){
+            res.send({
+                status: 100,
+                errNo: err.errno,
+                mensaje: err.message,
+                codigo: err.code
+            })
+        } else{
+            res.send({
+                status: 200
+            })
+        }
+    })
+})
+
+//Cambiando el boolean del campo curriculum de la tabla profesores al crear o eliminar un curriculum
+app.patch('/curriculum/profesor', (req, res) =>{
+    const {clave, bool} = req.body
+    const sql = 'UPDATE profesores set curriculum=? WHERE clave=?'
+    db.query(sql, [bool, clave], (err, result) =>{
+        if(err){
+            res.send({
+                status: 100,
+                errNo: err.errno,
+                mensaje: err.message,
+                codigo: err.code
+            })
+        } else{
+            res.send({
+                status: 200
+            })
+        }
+
+    })
+})
+
+//Eliminando el currículum
+app.delete('/curriculum/eliminar/:clave', (req, res) =>{
+    const {clave} = req.params
+    const sql = 'DELETE FROM curriculums WHERE clave=?'
+    db.query(sql, [clave], (err, result) =>{
+        if(!err){
+            res.send({
+                status: 200,
+                result,
+            })
+        }else{
+                res.send({
+                    status: 400,
+                    result: {}
+                })
+            }
+      })
+
 })
 
 app.all('*', (req,res) =>{
