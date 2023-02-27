@@ -129,6 +129,7 @@ app.get('/profesor/eliminar/:clave', (req, res) =>{
       })
 })
 
+//------------CURRICULUMS----------------------------------------
 //Post para la información del currículum
 app.post('/curriculum/agregar', (req, res) =>{
     const { 
@@ -137,11 +138,35 @@ app.post('/curriculum/agregar', (req, res) =>{
         ubicacionCentro,
         titulo,
         campoEstudio,
-        fechaGraduacion
-    } = req.body
-    const sql = 'INSERT INTO curriculums values(?,?,?,?,?,?)'
+        graduacion,
+        puesto,
+        empleador,
+        localidad,
+        fInicio,
+        fFinal,
+        descripcion,
+        nombres,
+        apellidos,
+        fNacimiento,
+        email,
+        sexo,
+        tCasa,
+        tCelular,
+        calle,
+        colonia,
+        cp,
+        competencias,
+        hobbies,
+        idiomas,
+        cursos,
+        actExtra,
+        redSociales,
+        valores
 
-    db.query(sql, [clave, centroEducativo, ubicacionCentro, titulo, campoEstudio, fechaGraduacion], (err, result) =>{
+    } = req.body
+    const sql = 'INSERT INTO curriculums values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+
+    db.query(sql, [clave, centroEducativo, ubicacionCentro, titulo, campoEstudio, graduacion, puesto, empleador, localidad, fInicio, fFinal, descripcion, nombres, apellidos, fNacimiento, email, sexo, tCasa, tCelular, calle, colonia, cp, competencias, hobbies, idiomas, cursos, actExtra, redSociales, valores], (err, result) =>{
         if(err){
             res.send({
                 status: 100,
@@ -156,7 +181,6 @@ app.post('/curriculum/agregar', (req, res) =>{
         }
     })
 })
-
 //Cambiando el boolean del campo curriculum de la tabla profesores al crear o eliminar un curriculum
 app.patch('/curriculum/profesor', (req, res) =>{
     const {clave, bool} = req.body
@@ -196,6 +220,77 @@ app.delete('/curriculum/eliminar/:clave', (req, res) =>{
             }
       })
 
+})
+//Obtener solu un currículum
+app.get('/curriculum/ver/:clave', (req,res) =>{
+    const {clave} = req.params
+    const sql = 'SELECT * FROM curriculums WHERE clave = ?'
+    db.query(sql, [clave], (err, result) =>{
+        if(!err){
+            res.send({
+                status: 200,
+                result,
+            })
+        }else{
+                res.send({
+                    status: 400,
+                    result: {}
+                })
+            }
+      })
+})
+
+//Actualizar la información del currículum
+app.put('/curriculum/modificar/:clave', (req, res) =>{
+    const { 
+        centroEducativo,
+        ubicacionCentro,
+        titulo,
+        campoEstudio,
+        graduacion,
+        puesto,
+        empleador,
+        localidad,
+        fInicio,
+        fFinal,
+        descripcion,
+        nombres,
+        apellidos,
+        fNacimiento,
+        email,
+        sexo,
+        tCasa,
+        tCelular,
+        calle,
+        colonia,
+        cp,
+        competencias,
+        hobbies,
+        idiomas,
+        cursos,
+        actExtra,
+        redSociales,
+        valores
+    } = req.body
+
+    const {clave} = req.params
+
+    const sql = 'UPDATE curriculums SET centroEducativo=?, ubicacionCentro=?, titulo=?, campoEstudio=?, graduacion=?, puesto=?, empleador=?, localidad=?, fInicio=?, fFinal=?, descripcion=?, nombres=?, apellidos=?, fNacimiento=?, email=?, sexo=?, tCasa=?, tCelular=?, calle=?, colonia=?, cp=?, competencias=?, hobbies=?, idiomas=?, cursos=?, actExtra=?, redSociales=?, valores=? WHERE clave=?'
+
+    db.query(sql, [centroEducativo, ubicacionCentro, titulo, campoEstudio, graduacion, puesto, empleador, localidad, fInicio, fFinal, descripcion, nombres, apellidos, fNacimiento, email, sexo, tCasa, tCelular, calle, colonia, cp, competencias, hobbies, idiomas, cursos, actExtra, redSociales, valores, clave], (err, result) =>{
+        if(err){
+            res.send({
+                status: 100,
+                errNo: err.errno,
+                mensaje: err.message,
+                codigo: err.code
+            })
+        } else{
+            res.send({
+                status: 200
+            })
+        }
+    })
 })
 
 app.all('*', (req,res) =>{
