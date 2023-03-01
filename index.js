@@ -40,25 +40,29 @@ app.post('/profesores/agregar', (req, res) =>{
     colonia,
     cp,
     municipio,
-    estado
+    estado,
+    pass
     } = req.body
 
-    const sql = "INSERT INTO profesores (clave, nombres, apellidos, fnacimiento, email, sexo, estadocivil, tcasa, curp, tcelular, calle, colonia, cp, municipio, estado, estatus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-    db.query(sql, [clave, nombre, apellidos, fNacimiento, email, sexo, estadoCivil, tCasa, curp, tCelular, calle, colonia, cp, municipio, estado, 'inactivo'], (err, result) =>{
-        if(err){
-            res.send({
-                status: 100,
-                errNo: err.errno,
-                mensaje: err.message,
-                codigo: err.code
-            })
-        } else{
-            res.send({
-                status: 200
-            })
-        }
-    })
+    bcrypt.hash(pass, saltRounds, (err, hash) =>{
+        const sql = "INSERT INTO profesores (clave, nombres, apellidos, fnacimiento, email, sexo, estadocivil, tcasa, curp, tcelular, calle, colonia, cp, municipio, estado, pass, estatus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        db.query(sql, [clave, nombre, apellidos, fNacimiento, email, sexo, estadoCivil, tCasa, curp, tCelular, calle, colonia, cp, municipio, estado, hash, 'inactivo'], (err, result) =>{
+            if(err){
+                res.send({
+                    status: 100,
+                    errNo: err.errno,
+                    mensaje: err.message,
+                    codigo: err.code
+                })
+            } else{
+                res.send({
+                    status: 200
+                })
+            }
+        })
+    })    
 })
+
 app.get('/profesores', (req, res) =>{
     const sql = 'SELECT * FROM profesores'
     db.query(sql, (err, result, fields) =>{
@@ -292,6 +296,41 @@ app.put('/curriculum/modificar/:clave', (req, res) =>{
         }
     })
 })
+
+//----------------Inicio de sesión----------------
+
+app.get('/profesor/acceder', (req, res) =>{
+    const {clave, password} = req.body
+
+    const sql = 'SELECT * from profesores WHERE clave = ?'
+
+    db.query(sql, [clave], (err, result) =>{
+        if(err){
+            return( res.send({
+                    status: 500,
+                    auth: false,
+                    mensaje: 'Problemas con el servidor, contacte al administrador',
+                    err
+                })
+            )
+        }
+        if(result.length > 0){
+            res.send({
+                mensaje: 'Holas'
+            })
+        }else{
+            res.send({
+                status: 404,
+                mensaje: 'El usuario no existe'
+
+            })
+        }
+    })
+
+
+})
+
+
 
 app.all('*', (req,res) =>{
     res.send('Esta ruta no existe')
